@@ -3,9 +3,9 @@
 ## Author: Paul Blanche
 ## Created: May 16 2018 (09:11) 
 ## Version: 
-## Last-Updated: May 17 2018 (09:23) 
+## Last-Updated: Aug 16 2018 (15:37) 
 ##           By: Paul Blanche
-##     Update #: 100
+##     Update #: 110
 ##----------------------------------------------------------------------
 ## 
 ### Commentary: 
@@ -63,7 +63,8 @@ PermutTestCompare2Curves <- function(data,
     if(!is.null(times)){
         data <- data[which(data[,varTime]%in% times),]
     }
-    ## }}}    
+    ## }}}
+    ## browser()
     ## {{{ Test statistics realisation on actual data
     MeanGrT <- tapply(X=data[,VarY],INDEX=data[,c(VarGroup,varTime)],FUN=mean)
     VarGrT <- tapply(X=data[,VarY],INDEX=data[,c(VarGroup,varTime)],FUN=var)
@@ -112,10 +113,10 @@ PermutTestCompare2Curves <- function(data,
     title("Actual data")
     lines(1:ncol(MeanGrT),MeanGrT[1,],type="b",col="red",pch=16,lwd=3,lty=2,cex=3)
     lines(1:ncol(MeanGrT),MeanGrT[2,],type="b",col="blue",pch=16,lwd=3,lty=2,cex=3)
-    legend("topleft",legend=paste0("group=",sort(unique(group)),", n=",c(sum(group==unique(group)[1]),sum(group==unique(group)[2]))),
+    legend("topleft",legend=paste0("group=",unique(group),", n=",c(sum(group==unique(group)[1]),sum(group==unique(group)[2]))),
            col=c("blue","red"),lwd=1,bty="n")
     legend("topright",
-           legend=paste0("Pointwise mean in group=",sort(unique(group))),
+           legend=paste0("Pointwise mean in group=",unique(group)),
            col=c("blue","red"),#lwd=3,lty=2,
            pch=16, cex=1,
            bty="n")
