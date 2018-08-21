@@ -3,9 +3,9 @@
 ## Author: Paul Blanche
 ## Created: May 16 2018 (09:11) 
 ## Version: 
-## Last-Updated: Aug 16 2018 (15:37) 
+## Last-Updated: Aug 21 2018 (15:51) 
 ##           By: Paul Blanche
-##     Update #: 110
+##     Update #: 125
 ##----------------------------------------------------------------------
 ## 
 ### Commentary: 
@@ -44,7 +44,6 @@ PermutTestCompare2Curves <- function(data,
                                      showOne=TRUE,
                                      seed=2902){
     startkl <- Sys.time()
-    ## browser()
     ## {{{ To plot p value with proper rounding
     specdec <- function(x, k) {
         xr <- round(x, k)
@@ -64,7 +63,6 @@ PermutTestCompare2Curves <- function(data,
         data <- data[which(data[,varTime]%in% times),]
     }
     ## }}}
-    ## browser()
     ## {{{ Test statistics realisation on actual data
     MeanGrT <- tapply(X=data[,VarY],INDEX=data[,c(VarGroup,varTime)],FUN=mean)
     VarGrT <- tapply(X=data[,VarY],INDEX=data[,c(VarGroup,varTime)],FUN=var)
@@ -89,7 +87,7 @@ PermutTestCompare2Curves <- function(data,
         VarGrTs <- tapply(X=ds[,VarY],INDEX=ds[,c(VarGroup,varTime)],FUN=var)
         nGrTs <- tapply(X=ds[,VarY],INDEX=ds[,c(VarGroup,varTime)],FUN=length)
         # test statistic
-        allstats[i] <- sum(((MeanGrTs[1,]-MeanGrTs[2,])^2)/(VarGrTs[1,]/nGrTs[1,] + VarGrTs[2,]/nGrTs[2,])) 
+        allstats[i] <- sum(((MeanGrTs[1,]-MeanGrTs[2,])^2)/(VarGrTs[1,]/nGrTs[1,] + VarGrTs[2,]/nGrTs[2,]))
     }
     p <- mean(allstats>stat)
     ForCIp <- binom.test(table(factor(allstats>stat,levels=c(TRUE,FALSE))))
@@ -111,8 +109,8 @@ PermutTestCompare2Curves <- function(data,
                      add=TRUE,
                      col="red")
     title("Actual data")
-    lines(1:ncol(MeanGrT),MeanGrT[1,],type="b",col="red",pch=16,lwd=3,lty=2,cex=3)
-    lines(1:ncol(MeanGrT),MeanGrT[2,],type="b",col="blue",pch=16,lwd=3,lty=2,cex=3)
+    lines(1:ncol(MeanGrT),MeanGrT[unique(group)[1],],type="b",col="blue",pch=16,lwd=3,lty=2,cex=3)
+    lines(1:ncol(MeanGrT),MeanGrT[unique(group)[2],],type="b",col="red",pch=16,lwd=3,lty=2,cex=3)
     legend("topleft",legend=paste0("group=",unique(group),", n=",c(sum(group==unique(group)[1]),sum(group==unique(group)[2]))),
            col=c("blue","red"),lwd=1,bty="n")
     legend("topright",
@@ -139,15 +137,14 @@ PermutTestCompare2Curves <- function(data,
                          legend=F,
                          add=TRUE,
                          col="red")
-        lines(1:ncol(MeanGrTs),MeanGrTs[1,],type="b",col="red",pch=16,lwd=3,lty=2,cex=3)
-        lines(1:ncol(MeanGrTs),MeanGrTs[2,],type="b",col="blue",pch=16,lwd=3,lty=2,cex=3)
+        lines(1:ncol(MeanGrTs),MeanGrTs[unique(group)[1],],type="b",col="blue",pch=16,lwd=3,lty=2,cex=3)
+        lines(1:ncol(MeanGrTs),MeanGrTs[unique(group)[2],],type="b",col="red",pch=16,lwd=3,lty=2,cex=3)
         title("One randomly permuted dataset")
         legend("bottomright",
                legend=paste0("Test stat=",specdec(allstats[NMC],3)),
                pch=NA, 
                bty="n")
-    }    
-    ## browser()
+    }
     hist(allstats,xlim=range(1.1*c(allstats,stat)),
          main=paste0("Distribution under the null\n(",NMC,
                      " replications, p-value=",
@@ -157,7 +154,6 @@ PermutTestCompare2Curves <- function(data,
                      "] )"),
          freq=FALSE,
          xlab="Test statistics")
-    ## browser()
     abline(v=stat,col="red",lty=2)
     text(x=stat, y=0,pos=2,labels="Obs. \n test stat\n on actual data",col="red")
     ## }}}
