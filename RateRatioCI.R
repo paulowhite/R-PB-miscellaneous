@@ -3,9 +3,9 @@
 ## Author: Paul Blanche
 ## Created: Feb  2 2018 (15:02) 
 ## Version: 
-## Last-Updated: Feb  8 2018 (13:38) 
+## Last-Updated: Oct  8 2019 (10:24) 
 ##           By: Paul Blanche
-##     Update #: 343
+##     Update #: 359
 ##----------------------------------------------------------------------
 ## 
 ### Commentary:
@@ -13,7 +13,7 @@
 ## Function to Compute confidence interval for directly standardized rates
 ## and rate ratios for sparse data. Method implemented include gamma confidence
 ## intervals (for DSR), exact confidence intervals (for crude rates),
-## the inverse of the F distribution (for DSR ratio), melted confidence (for DSR ratios)
+## the inverse of the F distribution (for DSR ratio), melded confidence (for DSR ratios)
 ## and some Wald confidence interval (also on log-scale) for comparison purpose.
 ## The methods are described in:
 ##
@@ -47,8 +47,8 @@
 ## pop0,              # population for group 0
 ## stdpop             # standard population to standardize aaccordingly
 ## conf.level = 0.95  # confidence level of confidence intervals
-## NMC=50000          # number of Monte Carlo simulation to compute Melted intervals
-## seed=1234          # seed for reproducibility of melted confidence intervals
+## NMC=50000          # number of Monte Carlo simulation to compute Melded intervals
+## seed=1234          # seed for reproducibility of melded confidence intervals
 ##
 ## Ouput:
 ##
@@ -66,7 +66,7 @@
 ## DSR.Ratio                  : DSR ratio
 ## log.Wald.CI.DSR.Ratio      : Wald confidence intervals for the DSR ratio, using the log for the normal approximation
 ## F.dist.CI.DSR.Ratio        : F distribution based confidence intervals for the DSR ratio
-## melted.CI.DSR.Ratio        : Melted gamma confidence intervals for the DSR ratio
+## melded.CI.DSR.Ratio        : Melded gamma confidence intervals for the DSR ratio
 ##
 ## ----------------------------------------------------------------------
 ## 
@@ -170,22 +170,22 @@ RateRatioCI <- function(count1, # counts for group 1
     colnames(logWaldCIDSR) <- c("lower","upper")
     rownames(logWaldCIDSR) <- c("group 0","group 1")
     ## }}}   
-
+    
     ## {{{ Gamma CI for each DSR
-    # similar to  epitools::ageadjust.direct
-    CIgamma <- function(alpha){
+    # similar to  xepitools::ageadjust.direct
+    CIgamma <- function(alpha1,alpha2){
         wM1 <- max(w/pop1)
         wM0 <- max(w/pop0)
-        lci.0 <- qgamma(alpha/2,
+        lci.0 <- qgamma(alpha1/2,
                         shape = (DSR0^2)/varDSR0,
                         scale = varDSR0/DSR0)
-        uci.0 <- qgamma(1 - alpha/2,
+        uci.0 <- qgamma(1 - alpha1/2,
                         shape = ((DSR0 + wM0)^2)/(varDSR0 + wM0^2),
                         scale = (varDSR0 + wM0^2)/(DSR0 + wM0))
-        lci.1 <- qgamma(alpha/2,
+        lci.1 <- qgamma(alpha2/2,
                         shape = (DSR1^2)/varDSR1,
                         scale = varDSR1/DSR1)
-        uci.1 <- qgamma(1 - alpha/2,
+        uci.1 <- qgamma(1 - alpha2/2,
                         shape = ((DSR1 + wM1)^2)/(varDSR1 + wM1^2),
                         scale = (varDSR1 + wM1^2)/(DSR1 + wM1))   
         gammaCIDSR <- rbind(c(lci.0,uci.0),
@@ -194,9 +194,7 @@ RateRatioCI <- function(count1, # counts for group 1
         rownames(gammaCIDSR) <- c("group 0","group 1")
         gammaCIDSR
     }
-
-    gammaCIDSR <- CIgamma(alpha)
-
+    gammaCIDSR <- CIgamma(alpha1=alpha,alpha2=alpha)
     ## }}}
 
     ## {{{ Wald CI for crude and directly standardized Rate Ratio
@@ -254,9 +252,9 @@ RateRatioCI <- function(count1, # counts for group 1
     names(F.dist.CI.DSR.Ratio) <- c("lower","upper")
     ## }}}
 
-    ## {{{ melted Gamma intervals
+    ## {{{ melded Gamma intervals
     
-    allsimu <- lapply(1:NMC,function(x){CIgamma(runif(1))})
+    allsimu <- lapply(1:NMC,function(x){CIgamma(runif(1),runif(1))})
     ## allsimu
     alllci0 <- unlist(lapply(allsimu,"[",1))
     alluci0 <- unlist(lapply(allsimu,"[",3))
@@ -270,11 +268,11 @@ RateRatioCI <- function(count1, # counts for group 1
 
     ## pgr <- length(gGreater[gGreater <= 1])/NMC
     ## pless <- length(gLess[gLess >= 1])/NMC
-    ## pvalueMelted <- min(1, 2 * pgr, 2 * pless)
+    ## pvalueMelded <- min(1, 2 * pgr, 2 * pless)
 
-    melted.CI.DSR.Ratio <- c(quantile(gGreater, probs = alpha),
+    melded.CI.DSR.Ratio <- c(quantile(gGreater, probs = alpha),
                              quantile(gLess, probs = 1 - alpha))
-    names(melted.CI.DSR.Ratio) <- c("lower","upper")
+    names(melded.CI.DSR.Ratio) <- c("lower","upper")
     ## }}}
     
     ## }}}
@@ -295,7 +293,7 @@ RateRatioCI <- function(count1, # counts for group 1
                 DSR.Ratio=DSRRatio,
                 log.Wald.CI.DSR.Ratio=log.Wald.CI.DSR.Ratio,
                 F.dist.CI.DSR.Ratio=F.dist.CI.DSR.Ratio,
-                melted.CI.DSR.Ratio=melted.CI.DSR.Ratio
+                melded.CI.DSR.Ratio=melded.CI.DSR.Ratio
                 )
     ## }}}
     
